@@ -1,16 +1,5 @@
 apply plugin: "java"
 apply plugin: 'application'
-apply plugin: "jtransc"
-
-mainClassName = "example.Test"
-
-sourceSets.main {
-	java {
-		srcDirs = [
-            'src',
-        ]
-	}
-}
 
 buildscript {
 	repositories {
@@ -19,6 +8,22 @@ buildscript {
 	}
 	dependencies {
 		classpath "com.jtransc:jtransc-gradle-plugin:$jtranscVersion"
+	}
+}
+apply plugin: 'jtransc'
+
+mainClassName = "example.Test"
+
+jtransc {
+	treeshaking = true
+	minimizeNames = false
+}
+
+sourceSets.main {
+	java {
+		srcDirs = [
+            'src',
+        ]
 	}
 }
 
@@ -33,8 +38,10 @@ dependencies {
 }
 
 jtransc {
-//	treeshaking = false
-//	minimizeNames = false
+	minimizeNames = false
 	treeshaking = true
-//	minimizeNames = true
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.0'
 }

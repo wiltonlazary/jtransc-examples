@@ -1,3 +1,5 @@
+import groovy.io.FileType
+
 apply plugin: "java"
 apply plugin: 'application'
 apply plugin: "jtransc"
@@ -45,24 +47,65 @@ dependencies {
 	testCompile group: 'junit', name: 'junit', version: '4.+'
 }
 
+def extraVersion = version
 jtransc {
-	title = "SpineSimpleTest1"
-	name = "SpineSimpleTest1"
-	version = "0.0.1"
+	title = "SpineDemo"
+	name = "SpineDemo"
 	company = "jtransc"
 	package_ = "com.jtransc.gdx.examples"
-	embedResources = true
-	//embedResources = false
+	initialWidth = 640
+	initialHeight = 480
+	fullscreen = false
+    resizable = true
+	borderless = false
+	orientation = "landscape"
+	param("allowHighDpi", "true")
+	vsync = false // WARNING: if this true, then fps value will be ignored
+	embedResources = false
 	assets = [
-		// @TODO: fix this!
 		"spine-runtimes/spine-libgdx/spine-libgdx-tests/assets"
 	]
-	vsync = true
 	relooper = true
-	analyzer = false
+	analyzer = true
 	treeshaking = true
 	minimizeNames = true
-//	minimizeNames = false
+
+	param("version", extraVersion)
+
+    // icon
+    icon = file("icons/icon.png").path
+    appendVar("androidIcons", file("icons/android.png").path)
+	appendVar("iosIcons", file("icons/ios.png").path)
+
+	param("useLimeFileHandle", "true")
+
+	param("fps", "1000")
+	param("showFPS", "true")
+
+	param("showDisplayInfo", "true")
+	param("showMemInfo", "true")
+
+	param("debugLimeFiles", "false")
+	param("debugLimeInput", "false")
+	param("debugAudio", "false")
+
+	// Windows
+	param("windows_arch", "X86") // allowed X86 or X64
+
+    // iOS
+//	param("certificate_team_id", "SK12FH34")
+    param("prerenderedIcon", "true")
+    param("deploymentVersion", "9.0") // < iOS 9 have 60 MB limit for app (plus problem on since iOS 10.3.2)
+	param("non_exempt_encryption", "true")
+	param("ios_device", "universal") // ipad iphone
+	file("splash-screens").eachFile (FileType.FILES) { file ->
+		appendVar("splashScreens", file.path)
+	}
+
+	// Android
+	param("androidTargetSdkVersion", "26")
+	param("androidInstallLocation", "preferExternal")
+	appendVar("androidPermissions", "com.android.vending.BILLING")
 
 	customTarget("cpp", "haxe:cpp", "exe")
 	customTarget("windows", "haxe:windows", "exe")
@@ -70,6 +113,9 @@ jtransc {
 	customTarget("mac", "haxe:mac", "app")
 	customTarget("android", "haxe:android", "apk")
 	customTarget("ios", "haxe:ios", "ipa")
-	customTarget("tizen", "haxe:tizen", "app")
 	customTargetMinimized("html5", "haxe:html5", "js")
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.0.1'
 }
